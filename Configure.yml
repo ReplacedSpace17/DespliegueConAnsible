@@ -1,0 +1,107 @@
+---
+- name: Configurar tres hosts virtuales en Apache
+  hosts: all
+  vars:
+    mysql_root_password: Javier1234567890$ 
+  become: yes
+  collections:
+    - community.mysql
+
+
+  tasks:
+    - name: Crear directorio /var/www/html/app
+      file:
+        path: /var/www/html/app
+        state: directory
+
+    - name: Crear directorio /var/www/html/static
+      file:
+        path: /var/www/html/static
+        state: directory
+
+    - name: Crear directorio /var/www/html/backend
+      file:
+        path: /var/www/html/backend
+        state: directory
+
+    - name: Copiar archivo de configuración de app.jgutierrez.com
+      copy:
+        src: files/app.jgutierrez.com.conf
+        dest: /etc/apache2/sites-available/app.jgutierrez.com.conf
+
+    - name: Copiar archivo de configuración de www.jgutierrez.com
+      copy:
+        src: files/www.jgutierrez.com.conf
+        dest: /etc/apache2/sites-available/www.jgutierrez.com.conf
+
+    - name: Copiar archivo de configuración de backend.jgutierrez.com
+      copy:
+        src: files/backend.jgutierrez.com.conf
+        dest: /etc/apache2/sites-available/backend.jgutierrez.com.conf
+
+    - name: Habilitar el host virtual app.jgutierrez.com
+      command: a2ensite app.jgutierrez.com.conf
+      notify:
+        - Restart Apache
+
+    - name: Habilitar el host virtual www.jgutierrez.com
+      command: a2ensite www.jgutierrez.com.conf
+      notify:
+        - Restart Apache
+
+    - name: Habilitar el host virtual backend.jgutierrez.com
+      command: a2ensite backend.jgutierrez.com.conf
+      notify:
+        - Restart Apache
+
+    - name: Crear base de datos dinamic_poblational_fish
+      mysql_db:
+        name: dinamic_poblational_fish
+      tags: mysql
+      vars:
+        mysql_root_password: "{{ mysql_root_password }}"  # Usar la variable definida en el inventario
+
+    - name: Ejecutar consulta SQL desde archivo
+      mysql_db:
+        login_user: root
+        login_password: "{{ mysql_root_password }}"  # Reemplaza con la contraseña de root de MySQL
+        login_host: localhost
+        login_port: 3306
+        db: dinamic_poblational_fish
+        state: import
+        target: /home/rs17/script/databses.sql  # Reemplaza con la ruta correcta al archivo SQL
+      tags: mysql
+
+
+    - name: Eliminar cuentas anónimas en MySQL
+      mysql_user:
+        login_user: root
+        login_password: Javier1234567890$  # Reemplaza con la contraseña de root de MySQL
+        state: absent
+        name: ""
+      tags: mysql
+
+    - name: Eliminar base de datos de prueba en MySQL
+      mysql_db:
+        login_user: root
+        login_password: Javier1234567890$  # Reemplaza con la contraseña de root de MySQL
+        state: absent
+        name: test
+      tags: mysql
+
+    - name: Configurar firewall para permitir tráfico HTTP
+      ufw:
+        rule: allow
+        port: http
+      tags: firewall
+
+  handlers:
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
+
+
+
+
+

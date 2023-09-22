@@ -1,0 +1,19 @@
+         
+---
+- name: Actualizar paquetes en servidores Ubuntu
+  hosts: all
+  become: yes  # Ejecutar comandos con privilegios de superusuario (sudo)
+
+  tasks:
+    - name: Actualizar lista de paquetes
+      apt:
+        update_cache: yes
+
+    - name: Actualizar paquetes instalados
+      apt:
+        upgrade: yes
+        autoremove: yes  # Eliminar paquetes obsoletos si es necesario
+        autoclean: yes   # Limpiar la caché de paquetes
+
+# Añade más tareas si es necesario
+#ansible-playbook inicial.yml

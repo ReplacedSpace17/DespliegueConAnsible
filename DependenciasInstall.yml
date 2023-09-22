@@ -1,0 +1,119 @@
+#Ansible para instalar todo lo necesario para desplegar la app
+#MYSQL
+#NODE
+#NPM
+#REACT
+
+---
+- name: Instalar requisitos para desplegar la app
+  hosts: all
+  become: yes
+  tasks:
+    - name: Actualizar lista de paquetes
+      apt:
+        update_cache: yes
+
+    - name: Instalar Node.js y npm
+      apt:
+        name: 
+          - nodejs
+          - npm
+        state: latest
+        
+    - name: Instalar MySQL Server
+      apt:
+        name: mysql-server
+        state: present
+
+    - name: Configurar contraseña de usuario root de MySQL
+      debconf:
+        name: "mysql-server"
+        question: "mysql-server/root_password"
+        value: Javier1234567890$ # Reemplaza con la contraseña que desees
+        vtype: password
+
+    - name: Confirmar contraseña de usuario root de MySQL
+      debconf:
+        name: "mysql-server"
+        question: "mysql-server/root_password_again"
+        value: Javier1234567890$  # Debe coincidir con la contraseña anterior
+        vtype: password
+
+    - name: Instalar paquetes adicionales para MySQL
+      apt:
+        name:
+          - mysql-client
+          - libmysqlclient-dev
+        state: present
+
+    - name: Instalar Apache
+      apt:
+        name: apache2
+        state: present
+
+    - name: Instalar libxml2
+      apt:
+        name: libxml2
+        state: present
+      become: yes
+
+    - name: Habilitar módulos de Apache necesarios
+      command: a2enmod proxy proxy_http proxy_html
+      become: yes
+
+    - name: Reiniciar Apache
+      service:
+        name: apache2
+        state: restarted
+
+    - name: Instalar UFW (Uncomplicated Firewall)
+      apt:
+        name: ufw
+        state: present
+
+    - name: Permitir SSH en UFW
+      ufw:
+        rule: allow
+        port: ssh
+
+    - name: Permitir HTTP en UFW (puerto 80)
+      ufw:
+        rule: allow
+        port: http
+
+    - name: Permitir HTTPS en UFW (puerto 443)
+      ufw:
+        rule: allow
+        port: https
+
+    - name: Habilitar UFW
+      ufw:
+        state: enabled
+
+    - name: Habilitar UFW después del reinicio
+      systemd:
+        name: ufw
+        enabled: yes
+        state: restarted
+
+- name: Instalar Python y Pip
+  hosts: all
+  become: yes
+  tasks:
+    - name: Instalar Python
+      raw: sudo apt-get update && sudo apt-get install -y python3
+      changed_when: false  # No reportar cambio en estado
+
+    - name: Instalar Pip
+      raw: sudo apt-get install -y python3-pip
+      changed_when: false  # No reportar cambio en estado
+
+- name: Instalar PyMySQL
+  hosts: all
+  become: yes
+  tasks:
+    - name: Instalar PyMySQL
+      pip:
+        name: pymysql
+
+

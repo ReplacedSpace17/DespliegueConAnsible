@@ -1,0 +1,99 @@
+---
+- name: Clonar repositorios, instalar dependencias y copiar archivos
+  hosts: all
+  become: yes  # Para ejecutar como superusuario (root), si es necesario
+
+  tasks:
+    - name: Crear carpeta de aplicaciones
+      ansible.builtin.file:
+        path: /home/rs17/Aplicaciones
+        state: directory
+      register: resultado_crear_carpeta
+
+    - name: Clonar repositorio Git Static
+      git:
+        repo: https://github.com/ReplacedSpace17/ApplicationStaticCetaceos.git
+        dest: /home/rs17/Aplicaciones/ApplicationStaticCetaceos
+      register: resultado_clonar_repo_static
+      when: resultado_crear_carpeta.changed
+
+    - name: Instalar dependencias con npm para ApplicationStaticCetaceos
+      command: npm install
+      args:
+        chdir: /home/rs17/Aplicaciones/ApplicationStaticCetaceos
+      register: resultado_npm_install_static
+      when: resultado_clonar_repo_static.changed
+
+    - name: Ejecutar npm run build para ApplicationStaticCetaceos
+      command: npm run build
+      args:
+        chdir: /home/rs17/Aplicaciones/ApplicationStaticCetaceos
+      register: resultado_npm_build_static
+      when: resultado_npm_install_static.changed
+
+    - name: Copiar archivos desde la carpeta build de ApplicationStaticCetaceos al servidor web
+      ansible.builtin.copy:
+        src: /home/rs17/Aplicaciones/ApplicationStaticCetaceos/build/
+        dest: /var/www/html/static/
+      register: resultado_copiar_build_static
+      when: resultado_npm_build_static.changed
+
+    - name: Clonar repositorio Git AppSimulationSpecies
+      git:
+        repo: https://github.com/ReplacedSpace17/AppSimulationSpecies.git
+        dest: /home/rs17/Aplicaciones/AppSimulationSpecies
+      register: resultado_clonar_app_sim
+
+    - name: Instalar dependencias con npm para AppSimulationSpecies
+      command: npm install
+      args:
+        chdir: /home/rs17/Aplicaciones/AppSimulationSpecies
+      register: resultado_npm_install_app_sim
+      when: resultado_clonar_app_sim.changed
+
+    - name: Ejecutar npm run build para AppSimulationSpecies
+      command: npm run build
+      args:
+        chdir: /home/rs17/Aplicaciones/AppSimulationSpecies
+      register: resultado_npm_build_app_sim
+      when: resultado_npm_install_app_sim.changed
+
+    - name: Copiar archivos desde la carpeta build de AppSimulationSpecies al servidor web
+      ansible.builtin.copy:
+        src: /home/rs17/Aplicaciones/AppSimulationSpecies/build/
+        dest: /var/www/html/app_simulation_species/
+      register: resultado_copiar_build_app_sim
+      when: resultado_npm_build_app_sim.changed
+
+    - name: Clonar repositorio Git BackendCetaceosApp
+      git:
+        repo: https://github.com/ReplacedSpace17/BackendCetaceosApp.git
+        dest: /home/rs17/Aplicaciones/BackendCetaceosApp
+      register: resultado_clonar_backend
+
+    - name: Instalar dependencias con npm para BackendCetaceosApp
+      command: npm install
+      args:
+        chdir: /home/rs17/Aplicaciones/BackendCetaceosApp
+      register: resultado_npm_install_backend
+      when: resultado_clonar_backend.changed
+
+    - name: Ejecutar npm run build para BackendCetaceosApp
+      command: npm run build
+      args:
+        chdir: /home/rs17/Aplicaciones/BackendCetaceosApp
+      register: resultado_npm_build_backend
+      when: resultado_npm_install_backend.changed
+
+    - name: Copiar archivos desde la carpeta build de BackendCetaceosApp al servidor web
+      ansible.builtin.copy:
+        src: /home/rs17/Aplicaciones/BackendCetaceosApp/build/
+        dest: /var/www/html/backend_cetaceos_app/
+      register: resultado_copiar_build_backend
+      when: resultado_npm_build_backend.changed
+
+    - name: Mostrar resultados
+      debug:
+        var: resultado_copiar_build_backend
+        verbosity: 1
+

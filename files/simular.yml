@@ -1,0 +1,86 @@
+---
+- name: Clonar repositorios, instalar dependencias y copiar archivos
+  hosts: all
+  become: yes  # Para ejecutar como superusuario (root), si es necesario
+
+  tasks:
+    - name: Crear carpeta de aplicaciones
+      ansible.builtin.file:
+        path: /home/rs17/Aplicaciones
+        state: directory
+      register: resultado_crear_carpeta
+
+    - name: Clonar repositorio Git Static
+      git:
+        repo: https://github.com/ReplacedSpace17/ApplicationStaticCetaceos.git
+        dest: /home/rs17/Aplicaciones/ApplicationStaticCetaceos
+      register: resultado_clonar_repo_static
+      when: resultado_crear_carpeta.changed
+
+    - name: Instalar dependencias con npm para ApplicationStaticCetaceos
+      ansible.builtin.file:
+        path: /home/rs17/y
+        state: directory
+      register: resultado_crear_carpeta
+
+    - name: Ejecutar npm run build para ApplicationStaticCetaceos
+      ansible.builtin.file:
+        path: /home/rs17/x/2
+        state: directory
+      register: resultado_crear_carpeta
+
+    - name: Copiar archivos desde la carpeta build de ApplicationStaticCetaceos al servidor web
+      ansible.builtin.file:
+        path: /home/rs17/x/3
+        state: directory
+      register: resultado_crear_carpeta
+
+    - name: Clonar repositorio Git AppSimulationSpecies
+      git:
+        repo: https://github.com/ReplacedSpace17/AppSimulationSpecies.git
+        dest: /home/rs17/Aplicaciones/AppSimulationSpecies
+      register: resultado_clonar_app_sim
+
+    - name: Instalar dependencias con npm para AppSimulationSpecies
+      ansible.builtin.file:
+        path: /home/rs17/x/4
+        state: directory
+      register: resultado_crear_carpeta
+
+    - name: Ejecutar npm run build para AppSimulationSpecies
+      ansible.builtin.file:
+        path: /home/rs17/x/5
+        state: directory
+      register: resultado_crear_carpeta
+
+    - name: Copiar archivos desde la carpeta build de AppSimulationSpecies al servidor web
+      ansible.builtin.file:
+        path: /home/rs17/x/6
+        state: directory
+      register: resultado_crear_carpeta
+
+    - name: Clonar repositorio Git BackendCetaceosApp
+      git:
+        repo: https://github.com/ReplacedSpace17/BackendCetaceosApp.git
+        dest: /home/rs17/Aplicaciones/BackendCetaceosApp
+      register: resultado_clonar_backend
+
+    - name: Instalar dependencias con npm para BackendCetaceosApp
+      ansible.builtin.file:
+        path: /home/rs17/x/7
+        state: directory
+      register: resultado_crear_carpeta
+
+    - name: Ejecutar npm run build para BackendCetaceosApp
+      ansible.builtin.file:
+        path: /home/rs17/x/8
+        state: directory
+      register: resultado_crear_carpeta
+
+    - name: Copiar archivos desde la carpeta build de BackendCetaceosApp al servidor web
+      ansible.builtin.file:
+        path: /home/rs17/x/9
+        state: directory
+      register: resultado_crear_carpeta
+
+
