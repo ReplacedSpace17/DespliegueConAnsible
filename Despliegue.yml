@@ -61,7 +61,7 @@
     - name: Copiar archivos desde la carpeta build de AppSimulationSpecies al servidor web
       ansible.builtin.copy:
         src: /home/rs17/Aplicaciones/AppSimulationSpecies/build/
-        dest: /var/www/html/app_simulation_species/
+        dest: /var/www/html/app/
       register: resultado_copiar_build_app_sim
       when: resultado_npm_build_app_sim.changed
 
@@ -88,7 +88,7 @@
     - name: Copiar archivos desde la carpeta build de BackendCetaceosApp al servidor web
       ansible.builtin.copy:
         src: /home/rs17/Aplicaciones/BackendCetaceosApp/build/
-        dest: /var/www/html/backend_cetaceos_app/
+        dest: /var/www/html/backend/
       register: resultado_copiar_build_backend
       when: resultado_npm_build_backend.changed
 
